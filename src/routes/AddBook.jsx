@@ -22,13 +22,13 @@ function AddBook() {
 
   // State to manage the book information
   const [book, setBook] = useState({
-    author: '', // Book author
-    name: '', // Book name/title
-    genres: [], // List of genres
-    completed: false, // Reading status
-    start: null, // Start date
-    end: null, // End date (if completed)
-    stars: null, // Star rating
+    author: '',
+    name: '',
+    genres: [],
+    completed: false,
+    start: null,
+    end: null,
+    stars: null,
   });
 
   // Handler for genre selection change

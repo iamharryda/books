@@ -16,7 +16,6 @@ import {
 function Books() {
   // State to hold the list of books fetched from the server
   const [books, setBooks] = useState([]);
-  // State to handle loading status while fetching data
   const [isLoading, setIsLoading] = useState(true);
 
   // useEffect runs when the component mounts
@@ -24,17 +23,17 @@ function Books() {
     if (books.length === 0) {
       getBooks(); // Fetch the books if the state is empty
     }
-  }, []); // Empty dependency array ensures this runs only on mount
+  }, []);
 
   // Function to fetch books data from the API
   // TODO: Replace axios with a custom useAxios hook for more modularity
   async function getBooks() {
     try {
-      const response = await axios.get('http://localhost:3000/books'); // API call to fetch books
-      setBooks(response.data); // Update state with the fetched books
-      setIsLoading(false); // Set loading to false after data is fetched
+      const response = await axios.get('http://localhost:3000/books');
+      setBooks(response.data);
+      setIsLoading(false);
     } catch (error) {
-      console.error(error); // Log any errors that occur during the API call
+      console.error(error);
     }
   }
 
@@ -63,25 +62,24 @@ function Books() {
                   width: '15%',
                   minWidth: 200,
                 }}
-                key={book.name} // Use the book name as a unique key
+                key={book.name}
               >
                 {/* Display the book image */}
                 <CardMedia
                   sx={{ height: 250 }}
-                  image={book.img} // Image source for the book
-                  title={book.name} // Alt text for the image
+                  image={book.img}
+                  title={book.name}
                 />
                 <Box sx={{ pt: 2, pl: 2 }}>
-                  {/* Display chips for each genre associated with the book */}
+
                   {book.genres.map((genre, i) => (
                     <Chip
-                      key={i} // Unique key for each genre chip
-                      label={genre} // Genre name
+                      key={i}
+                      label={genre}
                       variant="outlined"
                       size="small"
                     />
                   ))}
-                  {/* Book title and author details */}
                   <Typography variant="h6" component="h2" sx={{ mt: 2 }}>
                     {book.name}
                   </Typography>
@@ -96,14 +94,13 @@ function Books() {
                     pl: 2,
                   }}
                 >
-                  {/* Show the book's star rating */}
                   <Rating
                     name="read-only"
                     value={book.stars} // Rating value
                     readOnly
                     size="small"
                   />
-                  {/* Button for additional actions, e.g., navigating to book details */}
+
                   <Button size="small">Learn More</Button>
                 </CardActions>
               </Card>
