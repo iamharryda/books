@@ -10,13 +10,16 @@ import {
   Rating,
   Chip,
   Typography,
+  TextField,
   Alert,
 } from '@mui/material';
 import useAxios from '../services/useAxios';
 
 function Books() {
   const { data, alert, loading, get } = useAxios('http://localhost:3000'); // Initialize the hook with base URL
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState([]); // Store all books
+  const [filteredBooks, setFilteredBooks] = useState([]); // Store books after filtering
+  const [searchTerm, setSearchTerm] = useState(''); // State for the search input
 
   useEffect(() => {
     if (books.length === 0) {
@@ -29,17 +32,42 @@ function Books() {
     await get('books'); // Use the `get` function of `useAxios` hook
   };
 
-  // Set books when data is updated
+  // Update books when data is fetched
   useEffect(() => {
     if (data) {
       setBooks(data); // Update local state with fetched data
+      setFilteredBooks(data); // Set filteredBooks initially to all books
     }
   }, [data]);
+
+  // Handle search input changes
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+
+    // Filter books based on the search term
+    const filtered = books.filter(
+      (book) =>
+        book.name.toLowerCase().includes(term) ||
+        book.author.toLowerCase().includes(term) ||
+        book.genres.some((genre) => genre.toLowerCase().includes(term))
+    );
+    setFilteredBooks(filtered);
+  };
 
   return (
     <Box sx={{ mx: 'auto', p: 2 }}>
       {/* Show an alert if there's any */}
       {alert.show && <Alert severity={alert.type}>{alert.message}</Alert>}
+      {/* Search Input */}
+      <TextField
+        fullWidth
+        label="Search"
+        id="search"
+        value={searchTerm}
+        onChange={handleSearch}
+        sx={{ mb: 2 }}
+      />
       {/* Show a loading spinner while fetching data */}
       {loading && <CircularProgress />}
       {!loading && (
@@ -51,7 +79,7 @@ function Books() {
             useFlexGap
             flexWrap="wrap"
           >
-            {books.map((book) => (
+            {filteredBooks.map((book) => (
               <Card
                 sx={{
                   display: 'flex',
