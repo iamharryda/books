@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import {
   Box,
   Card,
@@ -11,41 +10,40 @@ import {
   Rating,
   Chip,
   Typography,
+  Alert,
 } from '@mui/material';
+import useAxios from '../services/useAxios';
 
 function Books() {
-  // State to hold the list of books fetched from the server
+  const { data, alert, loading, get } = useAxios('http://localhost:3000'); // Initialize the hook with base URL
   const [books, setBooks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // useEffect runs when the component mounts
   useEffect(() => {
     if (books.length === 0) {
-      getBooks(); // Fetch the books if the state is empty
+      fetchBooks(); // Fetch books on component mount
     }
   }, []);
 
-  // Function to fetch books data from the API
-  // TODO: Replace axios with a custom useAxios hook for more modularity
-  async function getBooks() {
-    try {
-      const response = await axios.get('http://localhost:3000/books');
-      setBooks(response.data);
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  // Fetch books from the server
+  const fetchBooks = async () => {
+    await get('books'); // Use the `get` function of `useAxios` hook
+  };
 
-  // TODO: Implement search functionality to filter books based on user input
+  // Set books when data is updated
+  useEffect(() => {
+    if (data) {
+      setBooks(data); // Update local state with fetched data
+    }
+  }, [data]);
+
   return (
     <Box sx={{ mx: 'auto', p: 2 }}>
-      {/* Show a loading spinner while data is being fetched */}
-      {isLoading && <CircularProgress />}
-
-      {!isLoading && (
+      {/* Show an alert if there's any */}
+      {alert.show && <Alert severity={alert.type}>{alert.message}</Alert>}
+      {/* Show a loading spinner while fetching data */}
+      {loading && <CircularProgress />}
+      {!loading && (
         <div>
-          {/* Stack component used for responsive layout and spacing */}
           <Stack
             sx={{ justifyContent: 'space-around' }}
             spacing={{ xs: 1 }}
@@ -53,7 +51,6 @@ function Books() {
             useFlexGap
             flexWrap="wrap"
           >
-            {/* Iterate over the books array and render a Card for each book */}
             {books.map((book) => (
               <Card
                 sx={{
@@ -64,14 +61,12 @@ function Books() {
                 }}
                 key={book.name}
               >
-                {/* Display the book image */}
                 <CardMedia
                   sx={{ height: 250 }}
                   image={book.img}
                   title={book.name}
                 />
                 <Box sx={{ pt: 2, pl: 2 }}>
-
                   {book.genres.map((genre, i) => (
                     <Chip
                       key={i}
@@ -96,11 +91,10 @@ function Books() {
                 >
                   <Rating
                     name="read-only"
-                    value={book.stars} // Rating value
+                    value={book.stars}
                     readOnly
                     size="small"
                   />
-
                   <Button size="small">Learn More</Button>
                 </CardActions>
               </Card>
