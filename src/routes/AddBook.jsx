@@ -19,6 +19,8 @@ function AddBook() {
   const [rateValue, setRateValue] = useState(3);
   const [hoverValue, setHoverValue] = useState(-1);
 
+  const defaultImage = "https://media.istockphoto.com/id/1396814518/vector/image-coming-soon-no-photo-no-thumbnail-image-available-vector-illustration.jpg?s=612x612&w=0&k=20&c=hnh2OZgQGhf0b46-J2z7aHbIWwq8HNlSDaNp2wn_iko=";
+
   const [book, setBook] = useState({
     author: '',
     name: '',
@@ -48,8 +50,20 @@ function AddBook() {
 
   const postHandler = async (e) => {
     e.preventDefault();
-    await post('books', book);
+
+    // Use defaultImage if no img URL is provided
+    const bookWithDefaultImage = {
+      ...book,
+      img: book.img || defaultImage, // Assign defaultImage if book.img is empty
+    };
+
+    try {
+      await post('books', bookWithDefaultImage);
+    } catch (error) {
+      console.error('Error adding book:', error);
+    }
   };
+
 
   return (
     <form onChange={addBookHandler} onSubmit={postHandler}>
