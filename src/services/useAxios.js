@@ -13,26 +13,35 @@ const useAxios = (baseUrl) => {
     }, 5000);
   };
 
-  const makeRequest = async (method, endpoint, payload = null) => {
+  const resetAlert = () => {
+    setAlert({ show: false, message: '', type: '' });
+  };
+
+  const makeRequest = async (method, endpoint, payload = null, showAlertFlag = true) => {
     try {
       setLoading(true);
       const response = await axios[method](`${baseUrl}/${endpoint}`, payload);
       setData(response.data);
-      showAlert('Book added successfully', 'success');
+      if (showAlertFlag) {
+        showAlert('Book added successfully', 'success');
+      }
     } catch (err) {
       showAlert(`Error: ${err.message}`, 'error');
     } finally {
       setLoading(false);
     }
   };
-  const get = async (endpoint) => makeRequest('get', endpoint);
-  const post = async (endpoint, payload) =>
-    makeRequest('post', endpoint, payload);
-  const update = async (endpoint, payload) =>
-    makeRequest('put', endpoint, payload);
-  const remove = async (endpoint) => makeRequest('delete', endpoint);
 
-  return { data, alert, loading, get, post, update, remove };
+  const get = async (endpoint, showAlertFlag = true) =>
+    makeRequest('get', endpoint, null, showAlertFlag);
+  const post = async (endpoint, payload, showAlertFlag = true) =>
+    makeRequest('post', endpoint, payload, showAlertFlag);
+  const update = async (endpoint, payload, showAlertFlag = true) =>
+    makeRequest('put', endpoint, payload, showAlertFlag);
+  const remove = async (endpoint, showAlertFlag = true) =>
+    makeRequest('delete', endpoint, null, showAlertFlag);
+
+  return { data, alert, loading, get, post, update, remove, resetAlert };
 };
 
 export default useAxios;

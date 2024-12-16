@@ -13,39 +13,37 @@ import {
   TextField,
   Alert,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import useAxios from '../services/useAxios';
 
 function Books() {
-  const { data, alert, loading, get } = useAxios('http://localhost:3000'); // Initialize the hook with base URL
-  const [books, setBooks] = useState([]); // Store all books
-  const [filteredBooks, setFilteredBooks] = useState([]); // Store books after filtering
-  const [searchTerm, setSearchTerm] = useState(''); // State for the search input
+  const { data, alert, loading, get, resetAlert } = useAxios('http://localhost:3000'); // Include resetAlert here
+  const [books, setBooks] = useState([]);
+  const [filteredBooks, setFilteredBooks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (books.length === 0) {
-      fetchBooks(); // Fetch books on component mount
+      fetchBooks();
     }
   }, []);
 
-  // Fetch books from the server
   const fetchBooks = async () => {
-    await get('books'); // Use the `get` function of `useAxios` hook
+    await get('books');
   };
 
-  // Update books when data is fetched
   useEffect(() => {
     if (data) {
-      setBooks(data); // Update local state with fetched data
-      setFilteredBooks(data); // Set filteredBooks initially to all books
+      setBooks(data);
+      setFilteredBooks(data);
     }
   }, [data]);
 
-  // Handle search input changes
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
 
-    // Filter books based on the search term
     const filtered = books.filter(
       (book) =>
         book.name.toLowerCase().includes(term) ||
@@ -57,9 +55,7 @@ function Books() {
 
   return (
     <Box sx={{ mx: 'auto', p: 2 }}>
-      {/* Show an alert if there's any */}
       {alert.show && <Alert severity={alert.type}>{alert.message}</Alert>}
-      {/* Search Input */}
       <TextField
         fullWidth
         label="Search"
@@ -68,7 +64,6 @@ function Books() {
         onChange={handleSearch}
         sx={{ mb: 2 }}
       />
-      {/* Show a loading spinner while fetching data */}
       {loading && <CircularProgress />}
       {!loading && (
         <div>
@@ -87,7 +82,7 @@ function Books() {
                   width: '15%',
                   minWidth: 200,
                 }}
-                key={book.name}
+                key={book.id}
               >
                 <CardMedia
                   sx={{ height: 250 }}
@@ -96,12 +91,7 @@ function Books() {
                 />
                 <Box sx={{ pt: 2, pl: 2 }}>
                   {book.genres.map((genre, i) => (
-                    <Chip
-                      key={i}
-                      label={genre}
-                      variant="outlined"
-                      size="small"
-                    />
+                    <Chip key={i} label={genre} variant="outlined" size="small" />
                   ))}
                   <Typography variant="h6" component="h2" sx={{ mt: 2 }}>
                     {book.name}
@@ -117,13 +107,16 @@ function Books() {
                     pl: 2,
                   }}
                 >
-                  <Rating
-                    name="read-only"
-                    value={book.stars}
-                    readOnly
+                  <Rating name="read-only" value={book.stars} readOnly size="small" />
+                  <Button
                     size="small"
-                  />
-                  <Button size="small">Learn More</Button>
+                    onClick={() => {
+                      resetAlert(); // Clear the alert
+                      navigate(`/book/${book.id}`); // Navigate to the detailed page
+                    }}
+                  >
+                    Learn More
+                  </Button>
                 </CardActions>
               </Card>
             ))}

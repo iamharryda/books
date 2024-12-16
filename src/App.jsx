@@ -6,6 +6,7 @@ import Root from './routes/Root';
 import Books from './routes/Books';
 import Book from './routes/Book';
 import AddBook from './routes/AddBook';
+import SinglePage from './routes/SinglePage';
 
 // Create a custom Material-UI theme
 const theme = createTheme({
@@ -27,11 +28,12 @@ function App() {
       element: <Root />, // Root layout component
       children: [
         { path: '/', element: <Books /> }, // Default route to display the list of books
-        { path: '/book', element: <Book /> }, // Route to display a single book's details
+        { path: '/book/:id', element: <SinglePage /> }, // Route to display a single book's details
         { path: '/addnew', element: <AddBook /> }, // Route to add a new book
       ],
     },
   ]);
+
 
   return (
     // Provide localization for date pickers using Day.js adapter
